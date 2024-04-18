@@ -24,6 +24,6 @@ def category_update():
     return controllers.category_update(request)
 
 
-@categories.route('/category/delete/<category_id>/<product_id>', methods=['DELETE'])
-def delete_category_by_id(category_id, product_id):
-    return controllers.delete_category_by_id(request, category_id, product_id)
+@categories.route('/category/delete/<category_id>/<service_id>', methods=['DELETE'])
+def delete_category_by_id(category_id, service_id):
+    return controllers.delete_category_by_id(request, category_id, service_id)

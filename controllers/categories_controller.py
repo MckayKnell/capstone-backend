@@ -3,7 +3,7 @@ from flask import jsonify
 from db import db
 from lib.authenticate import auth, auth_admin
 from models.categories import Categories, category_schema, categories_Schema
-from models.products import Products
+from models.services import Services
 from util.reflection import populate_object
 
 
@@ -22,7 +22,7 @@ def category_add(req):
         db.session.rollback
         return jsonify({"message": "unable to create record"}), 400
 
-    return jsonify({"message": "catenew_category created", "results": category_schema.dump(new_category)}), 200
+    return jsonify({"message": "new_category created", "results": category_schema.dump(new_category)}), 200
 
 
 @auth
@@ -56,22 +56,22 @@ def category_update(req, category_id):
 
     try:
         db.session.commit()
-        return jsonify({'message': 'product updated', 'results': category_schema.dump(query)}), 200
+        return jsonify({'message': 'category updated', 'results': category_schema.dump(query)}), 200
     except:
         db.session.rollback()
         return jsonify({"message": "unable to update record"}), 400
 
 
 @auth_admin
-def delete_category_by_id(req, category_id, product_id):
+def delete_category_by_id(req, category_id, service_id):
     category_query = db.session.query(Categories).filter(Categories.category_id == category_id).first()
-    products_query = db.session.query(Products).filter(Products.product_id == product_id).first()
+    services_query = db.session.query(Services).filter(Services.service_id == service_id).first()
 
     if not category_query:
         return jsonify({'message': ' category does not exist'}), 400
 
-    for product in products_query:
-        if category_query in product.categories:
-            products_query.categories.remove(category_query)
+    for service in services_query:
+        if category_query in service.categories:
+            services_query.categories.remove(category_query)
 
-            return ({'message': 'products removed', 'result': category_schema.dump(category_query)})
+            return ({'message': 'services removed', 'result': category_schema.dump(category_query)})
