@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 import psycopg2
 import os
 
@@ -21,6 +22,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f'{database_scheme}{database_user}@{data
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 init_db(app, db)
+
+CORS(app)
 
 
 def create_tables():

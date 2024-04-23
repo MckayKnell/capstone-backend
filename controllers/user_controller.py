@@ -7,7 +7,7 @@ from models.users import Users, user_schema, users_schema
 from util.reflection import populate_object
 
 
-@auth_admin
+# @auth_admin
 def add_user(req):
     post_data = request.form if request.form else request.json
 
@@ -33,6 +33,16 @@ def user_get_all(req):
     query = db.session.query(Users).all()
 
     return jsonify({'message': 'users found', 'results': users_schema.dump(query)}), 200
+
+
+@auth
+def users_active(req):
+    query = db.session.query(Users).filter(Users.active == True).all()
+
+    if not query:
+        return jsonify({"message": f'users could not be found'}), 404
+
+    return jsonify({"message": "users found", "results": users_schema.dump(query)}), 200
 
 
 @auth_admin

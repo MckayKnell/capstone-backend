@@ -1,7 +1,6 @@
 import marshmallow as ma
 import uuid
 from sqlalchemy.dialects.postgresql import UUID
-from datetime import datetime
 
 from db import db
 
@@ -23,7 +22,7 @@ class AuthTokens(db.Model):
 class AuthTokenSchema(ma.Schema):
     class Meta:
         fields = ['auth_token', 'user', 'expiration']
-    user = ma.fields.Nested('UsersSchema', only=['first_name', 'last_name', 'email', 'user_id'])
+    user = ma.fields.Nested('UsersSchema', only=['first_name', 'last_name', 'email', 'user_id', 'role'])
 
 
 auth_token_schema = AuthTokenSchema()

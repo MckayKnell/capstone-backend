@@ -4,6 +4,7 @@ from db import db
 from lib.authenticate import auth, auth_admin
 from models.services import Services, service_schema, services_schema
 from models.categories import Categories
+from models.orders import Orders
 from util.reflection import populate_object
 
 
@@ -40,6 +41,20 @@ def service_add_category(request):
 
 
 @auth_admin
+def service_add_order(request):
+    post_data = request.json
+    service_id = post_data.get('service_id')
+    order_id = post_data.get('order_id')
+
+    service_query = db.session.query(Services).filter(Services.service_id == service_id).first()
+    order_query = db.session.query(Orders).filter(Orders.order_id == order_id).first()
+
+    service_query.order.append(order_query)
+    db.session.commit()
+    return jsonify({'message': 'order assigned to service', 'results': service_schema.dump(service_query)})
+
+
+@auth_admin
 def service_remove_category(request):
     post_data = request.json
     service_id = post_data.get('service_id')
@@ -53,6 +68,20 @@ def service_remove_category(request):
     return jsonify({'message': 'category removed from service'})
 
 
+@auth_admin
+def service_remove_order(request):
+    post_data = request.json
+    service_id = post_data.get('service_id')
+    order_id = post_data.get('order_id')
+
+    service_query = db.session.query(Services).filter(Services.service_id == service_id).first()
+    order_query = db.session.query(Orders).filter(Orders.order_id == order_id).first()
+
+    service_query.order.remove(order_query)
+    db.session.commit()
+    return jsonify({'message': 'order removed from service'})
+
+
 @auth
 def services_get_all(req):
     query = db.session.query(Services).all()
@@ -61,8 +90,18 @@ def services_get_all(req):
 
 
 @auth
+def services_active(req):
+    query = db.session.query(Services).filter(Services.active == True).all()
+
+    if not query:
+        return jsonify({"message": f'service could not be found'}), 404
+
+    return jsonify({"message": "services found", "results": services_schema.dump(query)}), 200
+
+
+@auth
 def service_by_id(req, service_id):
-    query = db.session.query(Services).filter(Services.service_id == service_id).all()
+    query = db.session.query(Services).filter(Services.service_id == service_id).first()
 
     if not query:
         return jsonify({"message": f'service could not be found'}), 404

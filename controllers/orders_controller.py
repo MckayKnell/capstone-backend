@@ -7,31 +7,25 @@ from util.reflection import populate_object
 
 
 @auth_admin
-def order_add(req):
-    post_data = req.form if req.form else req.json
+def order_add(request):
+    post_data = request.form if request.form else request.json
 
-    fields = ['order_name']
-    required_fields = ['order_name']
+    new_order = Orders.new_order_obj()
+    populate_object(new_order, post_data)
 
-    values = {}
+    db.session.add(new_order)
+    db.session.commit()
+    return jsonify({"message": "order created", "results": order_schema.dump(new_order)}), 200
 
-    for field in fields:
-        field_data = post_data.get(field)
-        if field_data in required_fields and not field_data:
-            return jsonify({'message': f'(field) is required'}), 400
 
-        values[field] = field_data
+@auth
+def orders_active(req):
+    query = db.session.query(Orders).filter(Orders.active == True).all()
 
-    new_order = Orders(values['order_name'])
-    try:
-        db.session.add(new_order)
-        db.session.commit()
-        query = db.session.query(Orders).filter(Orders.order_name == values['order_name']).first()
-        values['order_id'] = query.order_id
-        return jsonify({'message': 'order created', 'result': values}), 201
-    except:
-        db.session.rollback()
-        return jsonify({'message': 'unable to create record'}), 400
+    if not query:
+        return jsonify({"message": f'orders could not be found'}), 404
+
+    return jsonify({"message": "orders found", "results": orders_schema.dump(query)}), 200
 
 
 @auth
@@ -43,7 +37,7 @@ def orders_get_all(req):
 
 @auth
 def order_by_id(req, order_id):
-    query = db.session.query(Orders).filter(Orders.order_id == order_id).all()
+    query = db.session.query(Orders).filter(Orders.order_id == order_id).first()
 
     if not query:
         return jsonify({"message": f'order could not be found'}), 404
@@ -58,12 +52,23 @@ def order_update(req, order_id):
 
     populate_object(query, post_data)
 
+    db.session.commit()
+    return jsonify({'message': 'order updated', 'results': order_schema.dump(query)}), 200
+
+
+@auth_admin
+def order_delete(req, order_id):
+    query = db.session.query(Orders).filter(Orders.order_id == order_id).first()
+
+    if not query:
+        return jsonify({"message": 'order could not be found'}), 404
+
     try:
+        db.session.delete(query)
         db.session.commit()
-        return jsonify({'message': 'order updated', 'results': {
-            'order_id': query.order_id,
-            'order_name': query.order_name
-        }}), 200
+
     except:
         db.session.rollback()
-        return jsonify({"message": "unable to update record"}), 400
+        return jsonify({"message": "unable to delete order"})
+
+    return jsonify({'message': 'record has been deleted'})

@@ -33,19 +33,13 @@ def categories_get_all(req):
 
 
 @auth
-def category_by_id(req, category_id):
-    query = db.session.query(Categories).filter(Categories.category_id == category_id).all()
+def categories_active(req):
+    query = db.session.query(Categories).filter(Categories.active == True).all()
 
     if not query:
         return jsonify({"message": f'category could not be found'}), 404
-    categories_list = []
 
-    for category in query:
-        categories_list.append({
-            "category_id": category.category_id,
-            "categories_name": category.category_name
-        })
-    return jsonify({"message": "category found", "results": categories_list}), 200
+    return jsonify({"message": "categories found", "results": categories_Schema.dump(query)}), 200
 
 
 @auth_admin
@@ -63,15 +57,18 @@ def category_update(req, category_id):
 
 
 @auth_admin
-def delete_category_by_id(req, category_id, service_id):
+def delete_category_by_id(req, category_id):
     category_query = db.session.query(Categories).filter(Categories.category_id == category_id).first()
-    services_query = db.session.query(Services).filter(Services.service_id == service_id).first()
+    # services_query = db.session.query(Services).filter(Services.service_id == service_id).first()
 
     if not category_query:
         return jsonify({'message': ' category does not exist'}), 400
 
-    for service in services_query:
-        if category_query in service.categories:
-            services_query.categories.remove(category_query)
+    # for service in services_query:
+    #     if category_query in service.categories:
+    #         services_query.categories.remove(category_query)
 
-            return ({'message': 'services removed', 'result': category_schema.dump(category_query)})
+    db.session.delete(category_query)
+    db.session.commit()
+
+    return ({'message': 'category deleted'})

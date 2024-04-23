@@ -15,15 +15,18 @@ class Services(db.Model):
     description = db.Column(db.String(),)
     price = db.Column(db.Float(), nullable=False)
     quantity = db.Column(db.Integer(), nullable=True)
+    active = db.Column(db.Boolean(), default=True)
 
     categories = db.relationship('Categories', secondary=service_category_xref, back_populates='services')
-    orders = db.relationship('Orders', secondary=service_order_xref, back_populates='services')
+    order = db.relationship('Orders', secondary=service_order_xref, back_populates='services')
+    scheduling = db.relationship('Scheduling', foreign_keys='[Scheduling.service_id]', back_populates='services')
 
-    def __init__(self, service_name, description, price, order_id, quantity):
+    def __init__(self, service_name, description, price, quantity, active):
         self.service_name = service_name
         self.description = description
         self.price = price
         self.quantity = quantity
+        self.active = active
 
     def new_service_obj():
         return Services("", "", 0, "", 0)
@@ -31,7 +34,7 @@ class Services(db.Model):
 
 class ServicesSchema(ma.Schema):
     class Meta:
-        fields = ['service_id', 'service_name', 'description', 'price', 'oder', 'categories', 'active']
+        fields = ['service_id', 'service_name', 'description', 'price', 'order', 'categories', 'active']
     order = ma.fields.Nested("OrdersSchema", exclude=['services'])
     categories = ma.fields.Nested("CategoriesSchema", many=True, exclude=['services'])
 

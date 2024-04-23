@@ -14,11 +14,21 @@ def scheduling_get_all():
     return controllers.scheduling_get_all(request)
 
 
+@scheduling.route('/scheduling/active', methods=['GET'])
+def scheduling_active():
+    return controllers.scheduling_active(request)
+
+
 @scheduling.route('/schedule/<schedule_id>', methods=['GET'])
 def schedule_by_id(schedule_id):
     return controllers.schedule_by_id(request, schedule_id)
 
 
 @scheduling.route('/schedule/<schedule_id>', methods=['PUT'])
-def schedule_update():
-    return controllers.schedule_update(request)
+def schedule_update(schedule_id):
+    return controllers.schedule_update(request, schedule_id)
+
+
+@scheduling.route('/schedule/delete/<schedule_id>', methods=['DELETE'])
+def schedule_delete(schedule_id):
+    return controllers.schedule_delete(request, schedule_id)

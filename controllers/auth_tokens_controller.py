@@ -15,7 +15,7 @@ def auth_token_add(req):
     if not email or not password:
         return jsonify({'message': 'invalid login'}), 401
 
-    now_datetime = datetime.utcnow()
+    now_datetime = datetime.now()
     expiration_datetime = now_datetime + timedelta(hours=12)
 
     user_data = db.session.query(Users).filter(Users.email == email).first()
@@ -37,3 +37,5 @@ def auth_token_add(req):
         db.session.commit()
 
         return jsonify({'message': 'auth success', 'auth_info': auth_token_schema.dump(new_token)})
+
+    return jsonify({'message': 'auth failed, no user found', 'auth_info': 'not found'})
