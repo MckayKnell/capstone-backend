@@ -34,7 +34,7 @@ class Services(db.Model):
 
 class ServicesSchema(ma.Schema):
     class Meta:
-        fields = ['service_id', 'service_name', 'description', 'price', 'order', 'categories', 'active']
+        fields = ['service_id', 'service_name', 'description', 'quantity', 'price', 'order', 'categories', 'active']
     order = ma.fields.Nested("OrdersSchema", exclude=['services'])
     categories = ma.fields.Nested("CategoriesSchema", many=True, exclude=['services'])
 
