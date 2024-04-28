@@ -19,9 +19,9 @@ class Orders(db.Model):
     user_id = db.Column(UUID(as_uuid=True), db.ForeignKey("Users.user_id"))
     notes = db.Column(db.String())
 
-    services = db.relationship('Services', secondary=service_order_xref, back_populates='order', cascade='all,delete')
-    user = db.relationship('Users', foreign_keys='[Orders.user_id]', back_populates='order', cascade='all,delete')
-    scheduling = db.relationship('Scheduling', back_populates='order', cascade='all,delete')
+    services = db.relationship('Services', secondary=service_order_xref, back_populates='order', cascade='all')
+    user = db.relationship('Users', foreign_keys='[Orders.user_id]', back_populates='order', cascade='all')
+    scheduling = db.relationship('Scheduling', back_populates='order', cascade='all')
 
     def __init__(self, timestamp, active, notes):
         self.timestamp = timestamp

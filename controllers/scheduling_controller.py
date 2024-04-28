@@ -37,16 +37,6 @@ def scheduling_active(req):
     return jsonify({"message": "schedule found", "results": schedules_schema.dump(query)}), 200
 
 
-@auth
-def schedule_by_id(req, schedule_id):
-    query = db.session.query(Scheduling).filter(Scheduling.schedule_id == schedule_id).all()
-
-    if not query:
-        return jsonify({"message": f'schedule could not be found'}), 404
-
-    return jsonify({"message": "schedule found", "results": schedule_schema.dump(query)}), 200
-
-
 @auth_admin
 def schedule_update(request, schedule_id):
     query = db.session.query(Scheduling).filter(Scheduling.schedule_id == schedule_id).first()

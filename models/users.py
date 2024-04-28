@@ -16,8 +16,8 @@ class Users(db.Model):
     last_name = db.Column(db.String(), nullable=False)
     active = db.Column(db.Boolean(), default=True)
 
-    auth = db.relationship('AuthTokens', back_populates='user', cascade='all,delete')
-    order = db.relationship('Orders', foreign_keys='[Orders.user_id]', back_populates='user', cascade='all,delete')
+    auth = db.relationship('AuthTokens', back_populates='user', cascade='all')
+    order = db.relationship('Orders', foreign_keys='[Orders.user_id]', back_populates='user', cascade='all')
 
     def __init__(self, first_name, last_name, role, email, password, active):
         self.first_name = first_name

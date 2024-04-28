@@ -3,7 +3,6 @@ from flask import jsonify
 from db import db
 from lib.authenticate import auth, auth_admin
 from models.categories import Categories, category_schema, categories_Schema
-from models.services import Services
 from util.reflection import populate_object
 
 
@@ -17,8 +16,7 @@ def category_add(req):
     try:
         db.session.add(new_category)
         db.session.commit()
-    except Exception as e:
-        print(e)
+    except:
         db.session.rollback
         return jsonify({"message": "unable to create record"}), 400
 
@@ -57,18 +55,17 @@ def category_update(req, category_id):
 
 
 @auth_admin
-def delete_category_by_id(req, category_id):
+def category_delete(req, category_id):
     category_query = db.session.query(Categories).filter(Categories.category_id == category_id).first()
-    # services_query = db.session.query(Services).filter(Services.service_id == service_id).first()
 
     if not category_query:
         return jsonify({'message': ' category does not exist'}), 400
 
-    # for service in services_query:
-    #     if category_query in service.categories:
-    #         services_query.categories.remove(category_query)
-
-    db.session.delete(category_query)
-    db.session.commit()
+    try:
+        db.session.delete(category_query)
+        db.session.commit()
+    except:
+        db.session.rollback()
+        return jsonify({'message': 'unable to delete category'})
 
     return ({'message': 'category deleted'})

@@ -61,7 +61,7 @@ def user_update(req, user_id):
 
 
 @auth_admin
-def user_delete_by_id(req, user_id):
+def user_delete(req, user_id):
     user_query = db.session.query(Users).filter(Users.user_id == user_id).first()
 
     if not user_query:

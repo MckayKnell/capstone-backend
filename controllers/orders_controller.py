@@ -12,9 +12,13 @@ def order_add(request):
 
     new_order = Orders.new_order_obj()
     populate_object(new_order, post_data)
+    try:
+        db.session.add(new_order)
+        db.session.commit()
+    except:
+        db.session.rollback
+        return jsonify({"message": "unable to create order"}), 400
 
-    db.session.add(new_order)
-    db.session.commit()
     return jsonify({"message": "order created", "results": order_schema.dump(new_order)}), 200
 
 
