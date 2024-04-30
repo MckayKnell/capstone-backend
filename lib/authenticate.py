@@ -4,7 +4,8 @@ from datetime import datetime
 from uuid import UUID
 
 from db import db
-from models.__init__ import AuthTokens, Users
+from models.auth_tokens import AuthTokens
+from models.users import Users
 
 
 def validate_uuid4(uuid_string):
